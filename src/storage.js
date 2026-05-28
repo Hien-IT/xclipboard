@@ -3,19 +3,55 @@ const { v4: uuidv4 } = require('uuid');
 
 const store = new Store({
   defaults: {
-    clipboardHistory: []
+    clipboardHistory: [],
+    settings: {
+      retentionDays: 30
+    }
   }
 });
 
 const MAX_ITEMS = 1000;
 
 class StorageManager {
+  static getSettings() {
+    return store.get('settings');
+  }
+
+  static updateSettings(newSettings) {
+    const currentSettings = this.getSettings();
+    store.set('settings', { ...currentSettings, ...newSettings });
+    this.cleanOldItems();
+  }
+
+  static cleanOldItems() {
+    const settings = this.getSettings();
+    if (settings.retentionDays <= 0) return; // 0 means keep forever
+
+    let history = store.get('clipboardHistory');
+    const now = Date.now();
+    const maxAgeMs = settings.retentionDays * 24 * 60 * 60 * 1000;
+
+    const initialLength = history.length;
+    history = history.filter(item => {
+      // Always keep favorites
+      if (item.favorite) return true;
+      // Delete if older than maxAge
+      return (now - item.timestamp) < maxAgeMs;
+    });
+
+    if (history.length !== initialLength) {
+      store.set('clipboardHistory', history);
+    }
+  }
+
   static getAllItems() {
+    this.cleanOldItems();
     return store.get('clipboardHistory');
   }
 
   static addItem(item) {
-    const history = this.getAllItems();
+    this.cleanOldItems();
+    const history = store.get('clipboardHistory');
     
     // Check for duplicate text
     if (item.type === 'text') {
@@ -55,13 +91,13 @@ class StorageManager {
   }
 
   static deleteItem(id) {
-    let history = this.getAllItems();
+    let history = store.get('clipboardHistory');
     history = history.filter(item => item.id !== id);
     store.set('clipboardHistory', history);
   }
 
   static toggleFavorite(id) {
-    const history = this.getAllItems();
+    const history = store.get('clipboardHistory');
     const item = history.find(i => i.id === id);
     if (item) {
       item.favorite = !item.favorite;
@@ -71,7 +107,7 @@ class StorageManager {
   }
 
   static clearHistory() {
-    const history = this.getAllItems();
+    const history = store.get('clipboardHistory');
     const favoritesOnly = history.filter(item => item.favorite);
     store.set('clipboardHistory', favoritesOnly);
   }

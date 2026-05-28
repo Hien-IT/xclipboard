@@ -7,6 +7,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
   clearHistory: () => ipcRenderer.invoke('clear-history'),
   pasteItem: (item) => ipcRenderer.invoke('paste-item', item),
   checkAccessibility: (prompt) => ipcRenderer.invoke('check-accessibility', prompt),
+  getSettings: () => ipcRenderer.invoke('get-settings'),
+  updateSettings: (settings) => ipcRenderer.invoke('update-settings', settings),
   
   onClipboardData: (callback) => {
     ipcRenderer.removeAllListeners('clipboard-data');

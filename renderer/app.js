@@ -296,6 +296,45 @@ accessibilityBtn.addEventListener('click', async () => {
   accessibilityBtn.style.color = "white";
 });
 
+// Settings Panel Logic
+const settingsBtn = document.getElementById('settingsBtn');
+const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+const settingsPanel = document.getElementById('settingsPanel');
+const retentionDaysInput = document.getElementById('retentionDays');
+
+settingsBtn.addEventListener('click', () => {
+  settingsPanel.classList.add('open');
+});
+
+closeSettingsBtn.addEventListener('click', () => {
+  settingsPanel.classList.remove('open');
+});
+
+// Close settings if click outside
+document.addEventListener('click', (e) => {
+  if (settingsPanel.classList.contains('open') && !settingsPanel.contains(e.target) && !settingsBtn.contains(e.target)) {
+    settingsPanel.classList.remove('open');
+  }
+});
+
+retentionDaysInput.addEventListener('change', async (e) => {
+  let days = parseInt(e.target.value);
+  if (isNaN(days) || days < 0) days = 0;
+  e.target.value = days;
+  
+  await window.electronAPI.updateSettings({ retentionDays: days });
+  // Reload data since old items might have been cleaned up
+  loadData();
+});
+
+async function loadSettings() {
+  const settings = await window.electronAPI.getSettings();
+  if (settings && settings.retentionDays !== undefined) {
+    retentionDaysInput.value = settings.retentionDays;
+  }
+}
+
 // Initial fetch
 loadData();
+loadSettings();
 checkAccessibility();

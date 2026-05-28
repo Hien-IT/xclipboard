@@ -150,6 +150,15 @@ app.whenReady().then(() => {
     return true;
   });
 
+  ipcMain.handle('get-settings', () => {
+    return StorageManager.getSettings();
+  });
+
+  ipcMain.handle('update-settings', (event, newSettings) => {
+    StorageManager.updateSettings(newSettings);
+    return true;
+  });
+
   ipcMain.handle('paste-item', (event, item) => {
     // Write back to system clipboard
     if (item.type === 'text' || item.type === 'link') {
