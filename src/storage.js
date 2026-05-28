@@ -14,7 +14,7 @@ const MAX_ITEMS = 1000;
 
 class StorageManager {
   static getSettings() {
-    return store.get('settings');
+    return store.get('settings') || {};
   }
 
   static updateSettings(newSettings) {
@@ -25,16 +25,21 @@ class StorageManager {
 
   static cleanOldItems() {
     const settings = this.getSettings();
-    if (settings.retentionDays <= 0) return; // 0 means keep forever
+    // Default to 30 if undefined
+    const retentionDays = settings.retentionDays !== undefined ? settings.retentionDays : 30;
+    
+    if (retentionDays <= 0) return; // 0 means keep forever
 
-    let history = store.get('clipboardHistory');
+    let history = store.get('clipboardHistory') || [];
     const now = Date.now();
-    const maxAgeMs = settings.retentionDays * 24 * 60 * 60 * 1000;
+    const maxAgeMs = retentionDays * 24 * 60 * 60 * 1000;
 
     const initialLength = history.length;
     history = history.filter(item => {
       // Always keep favorites
       if (item.favorite) return true;
+      // Safety check: if timestamp is missing, keep it
+      if (!item.timestamp) return true;
       // Delete if older than maxAge
       return (now - item.timestamp) < maxAgeMs;
     });
