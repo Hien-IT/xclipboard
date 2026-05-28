@@ -114,6 +114,24 @@ body {
   border-color: var(--accent);
 }
 
+.settings-btn {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-muted);
+  padding: 6px 10px;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-btn:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-main);
+}
+
 .clear-btn {
   background: transparent;
   border: 1px solid rgba(239, 68, 68, 0.3);
