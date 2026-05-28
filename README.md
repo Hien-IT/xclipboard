@@ -1,4 +1,4 @@
-<![CDATA[# ✂️ XClipBoard
+# ✂️ XClipBoard
 
 A sleek, lightweight clipboard manager for macOS built with Electron. XClipBoard lives in your menu bar and gives you instant access to your full clipboard history with a beautiful glassmorphism UI.
 
@@ -52,13 +52,13 @@ The `.dmg` installer will be available in the `dist/` folder.
 
 ## ⌨️ Keyboard Shortcuts
 
-| Shortcut | Action |
-|---|---|
-| `Cmd + Shift + V` | Toggle clipboard panel |
+| Shortcut               | Action                       |
+| ---------------------- | ---------------------------- |
+| `Cmd + Shift + V`      | Toggle clipboard panel       |
 | `Cmd + 1` to `Cmd + 9` | Quick paste item by position |
-| `←` / `→` | Navigate between items |
-| `Enter` | Paste selected item |
-| `Esc` | Close panel |
+| `←` / `→`              | Navigate between items       |
+| `Enter`                | Paste selected item          |
+| `Esc`                  | Close panel                  |
 
 ## 🏗️ Project Structure
 
@@ -82,9 +82,9 @@ xclipboard/
 
 Click the **⚙️ gear icon** in the top-right corner of the panel to access settings:
 
-| Setting | Default | Description |
-|---|---|---|
-| Keep history for (days) | 30 | Number of days to retain clipboard history. Set to `0` to keep forever. Favorites are always kept. |
+| Setting                 | Default | Description                                                                                        |
+| ----------------------- | ------- | -------------------------------------------------------------------------------------------------- |
+| Keep history for (days) | 30      | Number of days to retain clipboard history. Set to `0` to keep forever. Favorites are always kept. |
 
 ## 🔐 Permissions
 
@@ -105,4 +105,3 @@ XClipBoard requires **Accessibility** permission on macOS to enable the auto-pas
 ## 📄 License
 
 ISC © [Hien-IT](https://github.com/Hien-IT)
-]]>
