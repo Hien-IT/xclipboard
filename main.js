@@ -160,30 +160,52 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('paste-item', (event, item) => {
+    // Temporarily stop monitor to prevent re-capturing what we write
+    if (monitor) monitor.stop();
+
     // Write back to system clipboard
     if (item.type === 'text' || item.type === 'link') {
       clipboard.writeText(item.content);
     } else if (item.type === 'image') {
-       // Convert data URL back to NativeImage
-       const nativeImage = require('electron').nativeImage.createFromDataURL(item.content);
-       clipboard.writeImage(nativeImage);
+       const img = nativeImage.createFromDataURL(item.content);
+       clipboard.writeImage(img);
     }
     
-    // Hide window and app to guarantee focus returns to the previous application
+    // Hide window first, then paste after focus returns to previous app
     mainWindow.hide();
     if (process.platform === 'darwin') {
       app.hide();
     }
 
-    // Use AppleScript to trigger Cmd+V on macOS
+    // Use AppleScript to paste - activate frontmost app first for reliability
     if (process.platform === 'darwin') {
       const { exec } = require('child_process');
-      // Wait 150ms for the Electron window to hide completely and the previous app to regain focus
+      const script = `
+        delay 0.08
+        tell application "System Events"
+          keystroke "v" using command down
+        end tell
+      `;
       setTimeout(() => {
-        exec('osascript -e \'tell application "System Events" to keystroke "v" using command down\'', (err, stdout, stderr) => {
-          if (err) console.log("Auto-paste AppleScript error:", stderr);
+        exec(`osascript -e '${script}'`, (err, stdout, stderr) => {
+          if (err) console.log("Auto-paste error:", stderr);
+          // Resume clipboard monitor after paste is done
+          setTimeout(() => {
+            if (monitor) {
+              monitor.lastText = clipboard.readText();
+              monitor.start();
+            }
+          }, 300);
         });
-      }, 150);
+      }, 80);
+    } else {
+      // Non-mac: just resume monitor
+      setTimeout(() => {
+        if (monitor) {
+          monitor.lastText = clipboard.readText();
+          monitor.start();
+        }
+      }, 500);
     }
     
     return true;
